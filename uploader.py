@@ -10,24 +10,17 @@ UPLOADED_DIR = "uploaded_archive"
 os.makedirs(UPLOADED_DIR, exist_ok=True)
 
 def get_youtube_service():
+    oauth_url = "https://" + "://googleapis.com" + "/token"
+    yt_scope = "https://" + "://googleapis.com" + "/auth/youtube.upload"
     creds = Credentials(
         token=None,
         refresh_token=os.environ["YT_REFRESH_TOKEN"].strip(),
-        token_uri="https://googleapis.com",
+        token_uri=oauth_url,
         client_id=os.environ["YT_CLIENT_ID"].strip(),
         client_secret=os.environ["YT_CLIENT_SECRET"].strip(),
-        scopes=["https://googleapis.com"]
+        scopes=[yt_scope]
     )
     return build("youtube", "v3", credentials=creds)
-
-def upload_one_short():
-    videos = sorted([f for f in os.listdir(READY_DIR) if f.endswith(".mp4")])
-    if not videos:
-        print("No videos ready to upload.")
-        return
-
-    video_file = videos[0]
-    base_name = os.path.splitext(video_file)[0]
 
 def upload_one_short():
     videos = sorted([f for f in os.listdir(READY_DIR) if f.endswith(".mp4")])
