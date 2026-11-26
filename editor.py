@@ -15,7 +15,6 @@ HISTORY_FILE = "past_titles.txt"
 os.makedirs(TEMP_DIR, exist_ok=True)
 os.makedirs(READY_DIR, exist_ok=True)
 
-# High-retention viral Shorts story niches that rotate automatically
 NICHES = [
     "Mind-bending sci-fi world where everyone has a hidden rule, timer, or number above their head",
     "Creepy two-sentence horror expanded into a suspenseful 50-second first-person mystery",
@@ -78,8 +77,7 @@ Return ONLY valid JSON with these exact keys:
             contents=prompt,
             config={"response_mime_type": "application/json"}
         )
-        data = json.loads(response.text)
-        return data
+        return json.loads(response.text)
     except Exception as e:
         print(f"AI generation failed ({e}), using offline fallback.")
         return OFFLINE_FALLBACK
@@ -114,14 +112,14 @@ def create_srt(audio_path, srt_path):
                 chunk = words[i:i+3]
                 if not chunk:
                     continue
-                start = format_timestamp(chunk["start"])
+                start = format_timestamp(chunk[0]["start"])
                 end = format_timestamp(chunk[-1]["end"])
                 text = " ".join(w["word"].strip() for w in chunk).upper()
                 f.write(f"{idx}\n{start} --> {end}\n{text}\n\n")
                 idx += 1
 
 def build_short():
-  bgs = [os.path.join(RAW_DIR, x) for x in os.listdir(RAW_DIR) if x.endswith((".mp4", ".webm"))]
+    bgs = [os.path.join(RAW_DIR, x) for x in os.listdir(RAW_DIR) if x.endswith((".mp4", ".webm"))]
     if not bgs:
         print("No background videos in raw_backgrounds/!")
         return
@@ -163,7 +161,7 @@ def build_short():
         "-vf", vf,
         "-map", "0:v:0",
         "-map", "1:a:0",
-        "-c:v", "libx264", "-preset", "fast", "-crf", "22",
+        "-c:v", "libx264", "-preset", "fast", "-crf", "22", "-pix_fmt", "yuv420p",
         "-c:a", "aac", "-b:a", "192k",
         out_video
     ]
