@@ -1,56 +1,34 @@
 import os
 import random
 import subprocess
-import urllib.request
 
 RAW_DIR = "raw_backgrounds"
 os.makedirs(RAW_DIR, exist_ok=True)
 
-# Direct, unblockable public-domain / CC0 high-motion background video URLs
-DIRECT_BG_URLS = [
-    "https://wikimedia.org",
-    "https://googleapis.com",
-    "https://googleapis.com",
-    "https://googleapis.com",
-    "https://googleapis.com"
+PALETTES = [
+    ("0x0f0c29", "0x302b63", "0x24243e"),
+    ("0x1a002b", "0x4a0072", "0x004d40"),
+    ("0x001f3f", "0x0074D9", "0x111111"),
+    ("0x2b0909", "0x7a1c1c", "0x1c1c1c"),
+    ("0x09203f", "0x537895", "0x141e30")
 ]
 
-def generate_procedural_bg(out_path):
-    """Generates a smooth, hypnotic 75-second 1080x1920 neon plasma wave video using FFmpeg if downloads fail."""
-    print("Generating procedural neon background via FFmpeg...")
-    hue_speed = random.choice([25, 40, 60])
+def generate_procedural_bg():
+    out_path = os.path.join(RAW_DIR, "bg_generated.mp4")
+    c0, c1, c2 = random.choice(PALETTES)
+    hue_speed = random.choice([8, 12, 16, 20])
+    print("Generating clean 1080x1920 animated background via FFmpeg...")
     cmd = [
         "ffmpeg", "-y",
         "-f", "lavfi",
-        "-i", "gradients=s=1080x1920:d=75:r=30:c0=0x0f0c29:c1=0x302b63:c2=0x24243e:speed=0.05",
+        "-i", f"gradients=s=1080x1920:d=75:r=30:c0={c0}:c1={c1}:c2={c2}:speed=0.06",
         "-vf", f"hue=H={hue_speed}*t:s=1.4,noise=alls=8:allf=t+u",
-        "-c:v", "libx264", "-preset", "ultrafast", "-crf", "24",
+        "-c:v", "libx264", "-preset", "ultrafast", "-crf", "23", "-pix_fmt", "yuv420p",
         out_path
     ]
     subprocess.run(cmd, check=True)
-
-def fetch_backgrounds():
-    existing = [f for f in os.listdir(RAW_DIR) if f.endswith((".mp4", ".webm"))]
-    if existing:
-        print(f"Found {len(existing)} background(s) ready.")
-        return
-
-    # Try downloading 1 clean direct video first
-    url = random.choice(DIRECT_BG_URLS)
-    ext = ".webm" if url.endswith(".webm") else ".mp4"
-    out_file = os.path.join(RAW_DIR, f"bg_{random.randint(1000,9999)}{ext}")
-
-    try:
-        print(f"Downloading background from {url}...")
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=30) as resp, open(out_file, "wb") as f:
-            f.write(resp.read())
-        print("Download succeeded!")
-    except Exception as e:
-        print(f"Download failed ({e}), falling back to FFmpeg procedural background...")
-        if os.path.exists(out_file):
-            os.remove(out_file)
-        generate_procedural_bg(os.path.join(RAW_DIR, "bg_generated.mp4"))
+    print("Background ready!")
 
 if __name__ == "__main__":
-    fetch_backgrounds()
+    generate_procedural_bg()
+
