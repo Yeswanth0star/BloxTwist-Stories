@@ -121,7 +121,7 @@ def create_srt(audio_path, srt_path):
                 idx += 1
 
 def build_short():
-    bgs = [os.path.join(RAW_DIR, x) for x in os.listdir(RAW_DIR) if x.endswith(".mp4")]
+  bgs = [os.path.join(RAW_DIR, x) for x in os.listdir(RAW_DIR) if x.endswith((".mp4", ".webm"))]
     if not bgs:
         print("No background videos in raw_backgrounds/!")
         return
