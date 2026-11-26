@@ -28,6 +28,15 @@ def upload_one_short():
 
     video_file = videos[0]
     base_name = os.path.splitext(video_file)[0]
+
+def upload_one_short():
+    videos = sorted([f for f in os.listdir(READY_DIR) if f.endswith(".mp4")])
+    if not videos:
+        print("No videos ready to upload.")
+        return
+
+    video_file = videos[0]
+    base_name = os.path.splitext(video_file)[0]
     video_path = os.path.join(READY_DIR, video_file)
     meta_path = os.path.join(READY_DIR, f"{base_name}.json")
 
