@@ -26,8 +26,8 @@ def upload_one_short():
         print("No videos ready to upload.")
         return
 
-    video_file = videos
-    base_name = os.path.splitext(video_file)
+    video_file = videos[0]
+    base_name = os.path.splitext(video_file)[0]
     video_path = os.path.join(READY_DIR, video_file)
     meta_path = os.path.join(READY_DIR, f"{base_name}.json")
 
